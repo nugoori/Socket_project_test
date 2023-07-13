@@ -1,0 +1,23 @@
+# [ STS4 ]
+
+# folders
+bin
+target
+.settings
+
+# files
+.classpath
+.project
+.factorypath
+
+
+
+# [ inellij ]
+
+# folders
+.idea
+
+# files
+*.iml
+# // *.확장자명 = (확장자명)을 사용하는 파일을 사용하지 않음
+/.metadata/
