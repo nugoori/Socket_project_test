@@ -26,6 +26,7 @@ public class SimpleGUIServer {
 				ConnectedSocket connectedSocket = new ConnectedSocket(socket);
 				connectedSocket.start();
 				connectedSocketList.add(connectedSocket);
+				
 			}
 			
 		} catch (IOException e) {

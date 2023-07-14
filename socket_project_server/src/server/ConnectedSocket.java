@@ -100,6 +100,8 @@ public class ConnectedSocket extends Thread {
 	private void createRoom(String requestBody) {
 		String roomName = (String) gson.fromJson(requestBody, RequestBodyDto.class).getBody();
 		
+		username = username + "(방장)";
+		
 		Room newRoom = Room.builder()
 				.roomName(roomName)
 				.owner(username)
@@ -126,6 +128,8 @@ public class ConnectedSocket extends Thread {
 	private void join(String requestBody) {
 		String roomName = (String) gson.fromJson(requestBody, RequestBodyDto.class).getBody();
 		
+		
+		
 		SimpleGUIServer.roomList.forEach(room -> {
 			if(room.getRoomName().equals(roomName)) {
 				room.getUserList().add(this);
@@ -142,6 +146,7 @@ public class ConnectedSocket extends Thread {
 							new RequestBodyDto<String>("showMessage", username + "님이 입장하셨습니다.");
 					
 					ServerSender.getInstance().send(connectedSocket.socket , updateUserListDto);
+
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -152,6 +157,7 @@ public class ConnectedSocket extends Thread {
 				
 			}
 		});		
+		
 	}
 	
 	private void sendMessage(String requestBody) {
@@ -172,13 +178,50 @@ public class ConnectedSocket extends Thread {
 		
 	}
 	
+//	 소캣을 끊어버린다? 
+//	 usernameList에서 지운다? > usernameList를 어캐 가져오지
 	private void exitRoom(String requestBody) {
+		
 		String roomName = (String) gson.fromJson(requestBody, RequestBodyDto.class).getBody();
 		
 		SimpleGUIServer.roomList.forEach(room -> {
 			if(room.getRoomName().equals(roomName)) {
-				SimpleGUIServer.roomList.remove(this);
+				room.getUserList().remove(this);
+				
+				List<String> newUserList = new ArrayList<>();
+				
+				room.getUserList().forEach(con -> {
+					newUserList.add(con.username);
+				});
+				
+				room.getUserList().forEach(con -> {
+					RequestBodyDto<List<String>> updateUserDto = 
+							new RequestBodyDto<List<String>>("exitUserList", newUserList);
+					
+						ServerSender.getInstance().send(con.socket, updateUserDto);
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					RequestBodyDto<String> exitUserDto = 
+							new RequestBodyDto<String>("showMessage", username + "님이 나가셨습니다.");
+					
+					ServerSender.getInstance().send(con.socket, exitUserDto);
+					
+				});
+			}	
+		});
+	
+	}
+	
+	private void clearRoom(String requestBody) {
+		SimpleGUIServer.roomList.forEach(room -> {
+			if(room.getOwner() == ) {
+			
 			}
+			
 		});
 	}
 	

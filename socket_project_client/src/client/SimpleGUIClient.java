@@ -26,6 +26,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import java.awt.Color;
+import javax.swing.JLabel;
 
 @Getter
 public class SimpleGUIClient extends JFrame {
@@ -58,6 +61,8 @@ public class SimpleGUIClient extends JFrame {
 	private JScrollPane userListScrollPanel;
 	private DefaultListModel<String> userListModel;
 	private JList userList;
+	private JTextPane roomTitleNamePane;
+	private JLabel roomTitleLabel;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -81,6 +86,7 @@ public class SimpleGUIClient extends JFrame {
 	
 	public SimpleGUIClient() {
 		username = JOptionPane.showInputDialog(chattingRoomPanel, "아이디를 입력하세요");
+		setTitle(username);
 		
 		if(Objects.isNull(username)) {
 			System.exit(0);
@@ -130,12 +136,15 @@ public class SimpleGUIClient extends JFrame {
 				}
 				
 				RequestBodyDto<String> requestBodyDto = new RequestBodyDto<String>("createRoom", roomName);
+				
 				ClientSender.getInstance().send(requestBodyDto);
 				
 				mainCardLayout.show(mainCardPanel, "chattingRoomPanel");
 				requestBodyDto = new RequestBodyDto<String>("join", roomName);
+				roomTitleLabel.setText(roomName);
 				ClientSender.getInstance().send(requestBodyDto);
-				setTitle(roomName);
+				
+				
 			}
 		});
 		chattingRoomListPanel.add(createRoomButton);
@@ -153,7 +162,9 @@ public class SimpleGUIClient extends JFrame {
 				if(e.getClickCount() == 2) {
 					String roomName = roomListModel.get(roomList.getSelectedIndex());
 					mainCardLayout.show(mainCardPanel, "chattingRoomPanel");
+					
 					RequestBodyDto<String> requestBodyDto = new RequestBodyDto<String>("join", roomName);
+					roomTitleLabel.setText(roomName);
 					ClientSender.getInstance().send(requestBodyDto);
 				}
 			}
@@ -166,7 +177,7 @@ public class SimpleGUIClient extends JFrame {
 		mainCardPanel.add(chattingRoomPanel, "chattingRoomPanel");
 		
 		JScrollPane chattingAreaScrollPanel = new JScrollPane();
-		chattingAreaScrollPanel.setBounds(12, 10, 296, 189);
+		chattingAreaScrollPanel.setBounds(12, 40, 296, 159);
 		chattingRoomPanel.add(chattingAreaScrollPanel);
 		
 		chattingTextArea = new JTextArea();
@@ -202,23 +213,36 @@ public class SimpleGUIClient extends JFrame {
 		userList = new JList(userListModel);
 		userListScrollPanel.setViewportView(userList);
 		
+		// username을 보내면 서버에서 usernameList를 불러올 방법을 모르겠음
+		// roomName을 보내려면 roomList에서 꺼내와야 하는데 String 타입으로 꺼낼 방법을 모르겠음
+		// roomTitle을 띄울때 사용한 roomName을 toString으로 가져옴 // 동현이가한 방법
 		JButton exitRoomButton = new JButton("나가기");
 		exitRoomButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				JOptionPane.showConfirmDialog(chattingRoomPanel, "방을 나가시겠습니까.");
+				JOptionPane.showConfirmDialog(chattingRoomPanel, "방을 나가시겠습니까.", "방나가기", 1);
+		
+//				String roomName = roomListModel.get(roomList.getSelectedIndex()); // > getSelectedIndex 오류남
+//				String username = userListModel.get(userList.getSelectedIndex()); // > 이건 귓보낼때 써야할듯?
+			
+				String roomName = roomTitleLabel.getText();
 				
-//				String roomName = roomListModel.get(roomList.getSelectedIndex()); > getSelectedIndex 오류남
+				RequestBodyDto<String> requestBodyDto = new RequestBodyDto<String>("exitRoom", roomName);
 				
-				RequestBodyDto<String> requestBodyDto = new RequestBodyDto<String>("exitRoom", "");
+				mainCardLayout.show(mainCardPanel, "chattingRoomListPanel");
 				ClientSender.getInstance().send(requestBodyDto);
-
 			}
 			
 		});
 		exitRoomButton.setBounds(320, 209, 92, 32);
 		
 		chattingRoomPanel.add(exitRoomButton);
+		
+
+		roomTitleLabel = new JLabel();
+		roomTitleLabel.setBounds(12, 10, 296, 25);
+		chattingRoomPanel.add(roomTitleLabel);
+	
 		
 		
 

@@ -48,10 +48,11 @@ public class ClientReceiver extends Thread {
 		case "updateUserList":
 			updateUserList(requestBody);
 			break;
-			
-		case "exitRoom":
-			updateUserList(requestBody);
+		case "exitUserList":
+			exitUserList(requestBody);
 			break;
+			
+
 
 		default:
 			break;
@@ -75,12 +76,13 @@ public class ClientReceiver extends Thread {
 		SimpleGUIClient.getInstance().getUserListModel().clear();
 		SimpleGUIClient.getInstance().getUserListModel().addAll(usernameList);
 	}
-	
-	private void exitUsername(String requestBody) {
+	private void exitUserList(String requestBody) {
 		List<String> usernameList = (List<String>) gson.fromJson(requestBody, RequestBodyDto.class).getBody();
 		SimpleGUIClient.getInstance().getUserListModel().clear();
 		SimpleGUIClient.getInstance().getUserListModel().addAll(usernameList);
 	}
+	
+	
 	
 	
 }
